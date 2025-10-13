@@ -1,0 +1,30 @@
+# NYCMG Web Frontend Requirements
+
+## Core Dependencies
+react>=18.2.0
+react-dom>=18.2.0
+react-router-dom>=6.4.0
+@reduxjs/toolkit>=1.8.0
+react-redux>=8.0.0
+axios>=1.1.0
+@mui/material>=5.10.0
+@mui/icons-material>=5.10.0
+@emotion/react>=11.10.0
+@emotion/styled>=11.10.0
+react-dropzone>=13.0.0
+howler>=2.2.0
+
+## Development Dependencies
+react-scripts>=5.0.0
+@testing-library/react>=13.4.0
+@testing-library/jest-dom>=5.16.0
+@testing-library/user-event>=14.4.0
+eslint>=8.25.0
+
+## Build Requirements
+Node.js >= 16.x
+npm >= 8.x OR yarn >= 1.22.x
+
+## Environment Variables Required
+REACT_APP_API_BASE_URL= # Backend API base URL (e.g., http://localhost:3001/api/v1)
+REACT_APP_WS_BASE_URL= # WebSocket base URL (e.g., ws://localhost:3001)

@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alerts.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'nycmg-backend'
+    static_configs:
+      - targets: ['backend:3000']
+    metrics_path: '/api/metrics'
+
+  - job_name: 'nycmg-web'
+    static_configs:
+      - targets: ['web:3000']
+
+  - job_name: 'nycmg-database'
+    static_configs:
+      - targets: ['db:5432']
+    metrics_path: '/metrics'

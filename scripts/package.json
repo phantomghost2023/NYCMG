@@ -1,0 +1,16 @@
+{
+  "name": "nycmg-scripts",
+  "version": "1.0.0",
+  "description": "Helper scripts for NYCMG project management",
+  "main": "update-progress.js",
+  "scripts": {
+    "update-progress": "node update-progress.js"
+  },
+  "keywords": [
+    "nycmg",
+    "project-management",
+    "tracking"
+  ],
+  "author": "NYCMG Team",
+  "license": "MIT"
+}

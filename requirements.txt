@@ -1,0 +1,41 @@
+# NYCMG Project Requirements
+
+## System Requirements
+Node.js >= 16.x
+npm >= 8.x OR yarn >= 1.22.x
+PostgreSQL >= 12.x
+Git >= 2.30.0
+
+## Database
+PostgreSQL >= 12.x with:
+- pg_trgm extension (for text search)
+- uuid-ossp extension (for UUID generation)
+
+## Development Tools
+- Code editor (VS Code recommended)
+- PostgreSQL client (pgAdmin or psql)
+- REST API client (Postman or Insomnia)
+- Git client
+
+## Backend Requirements
+See backend/requirements.txt for detailed backend dependencies
+
+## Web Frontend Requirements
+See web/requirements.txt for detailed web frontend dependencies
+
+## Mobile App Requirements
+See mobile/requirements.txt for detailed mobile app dependencies
+
+## Environment Setup
+1. Install Node.js and npm/yarn
+2. Install PostgreSQL
+3. Create database and user
+4. Enable required PostgreSQL extensions
+5. Set up environment variables in each module
+6. Install dependencies using npm install or yarn install
+
+## Recommended Development Environment
+- Operating System: Windows 10/11, macOS 10.15+, or Ubuntu 20.04+
+- RAM: 8GB minimum, 16GB recommended
+- Storage: 10GB free space minimum
+- IDE: VS Code with recommended extensions

@@ -1,0 +1,40 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Avenir Next, Avenir,
+    Helvetica, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Custom styles for NYCMG */
+.nycmg-header {
+  background-color: #FF4081;
+  color: white;
+}
+
+.nycmg-map-container {
+  height: 400px;
+  width: 100%;
+}
+
+.nycmg-borough-card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.nycmg-borough-card:hover {
+  transform: translateY(-5px);
+}
