@@ -4,7 +4,9 @@
   "description": "Helper scripts for NYCMG project management",
   "main": "update-progress.js",
   "scripts": {
-    "update-progress": "node update-progress.js"
+    "update-progress": "node update-progress.js",
+    "create-admin": "node create-admin-user.js",
+    "test-admin": "node test-admin-login.js"
   },
   "keywords": [
     "nycmg",
@@ -12,5 +14,11 @@
     "tracking"
   ],
   "author": "NYCMG Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "node-fetch": "^3.3.2"
+  }
 }

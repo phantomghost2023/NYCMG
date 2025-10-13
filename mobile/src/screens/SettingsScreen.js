@@ -316,6 +316,18 @@ const SettingsScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Error Handling</Text>
+        
+        <TouchableOpacity 
+          style={styles.settingItem} 
+          onPress={() => navigation.navigate('ErrorHandling')}
+        >
+          <Text style={styles.settingLabel}>AI Error Handler</Text>
+          <Text style={styles.settingValue}>View and manage errors</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
         <Text style={styles.sectionTitle}>About</Text>
         
         <View style={styles.settingItem}>

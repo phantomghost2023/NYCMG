@@ -1,113 +1,72 @@
-# NYCMG Web App
+# NYCMG Web Application
 
-This is the web application for the NYCMG (NYC Music Growth) platform, built with Next.js and React.
+The web frontend for the NYC Music Guide platform, built with Next.js and Material-UI.
 
-## Prerequisites
+## Features
 
-See [requirements.txt](requirements.txt) for detailed system and software requirements.
+### Music Discovery
+- **Map-Based Discovery**: Interactive map showing artists and venues across NYC boroughs
+- **Search**: Advanced search functionality for tracks, artists, and albums
+- **Borough Exploration**: Dedicated pages for each NYC borough
 
-## Installation
+### Social Features
+- **User Profiles**: Customizable profiles with activity feeds
+- **Following System**: Follow artists and other users
+- **Social Interactions**: Like, comment, and share functionality
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd NYCMG/web
-   ```
+### Music Library
+- **Personal Library**: Save favorite tracks, albums, and playlists
+- **Playlist Management**: Create and manage custom playlists
+- **Listening History**: Track previously played music
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+### Content Creation
+- **Track Upload**: Artists can upload their music
+- **Profile Customization**: Customize artist profiles
 
-## Running the Application
+### Admin Dashboard
+- **User Management**: Admin tools for managing user accounts
+- **Content Moderation**: Review and moderate reported content
+- **Analytics & Reporting**: Platform statistics and insights
 
-### Development Mode
+## Getting Started
+
+### Prerequisites
+- Node.js (v14 or later)
+- npm or yarn
+
+### Installation
+```bash
+npm install
+```
+
+### Development
 ```bash
 npm run dev
 ```
-The application will be available at http://localhost:3000
 
-### Production Mode
+### Production
 ```bash
 npm run build
 npm start
 ```
 
 ## Project Structure
-
 ```
-web/
-├── src/
-│   ├── pages/          # Next.js pages
-│   ├── components/     # React components
-│   ├── store/          # Redux store and slices
-│   ├── styles/         # CSS and styling files
-│   ├── assets/         # Images, fonts, etc.
-│   ├── utils/          # Utility functions
-│   └── hooks/          # Custom React hooks
-├── public/             # Static assets
-└── styles/             # Global styles
+src/
+├── components/     # Reusable UI components
+├── pages/          # Next.js pages
+├── store/          # Redux store and slices
+├── styles/         # Global styles
+└── services/       # API service functions
 ```
-
-### Pages
-- `pages/index.js` - Home page
-- `pages/login.js` - Login page
-- `pages/register.js` - Registration page
-- `pages/boroughs/[id].js` - Borough detail page
-- `pages/artists/[id].js` - Artist profile page
-
-### Components
-Reusable UI components are located in the `src/components/` directory.
-
-### State Management
-The app uses Redux Toolkit for state management with slices for different features:
-- `authSlice` - Authentication state
-- `boroughSlice` - Borough data
-- `artistSlice` - Artist data
-
-### Styling
-The app uses Material-UI for components and styling. Global styles are in `src/styles/globals.css`.
-
-## API Integration
-The web app communicates with the backend API through Redux async thunks. The base API URL is configured in the shared module.
 
 ## Testing
-
 ```bash
 npm test
 ```
 
-## Linting
-
-```bash
-npm run lint
-```
-
 ## Deployment
-
-The app can be deployed to any platform that supports Next.js applications, such as Vercel, Netlify, or a custom Node.js server.
-
-### Deploy to Vercel
-1. Push your code to a Git repository
-2. Connect the repository to Vercel
-3. Vercel will automatically detect the Next.js framework and configure the deployment
-
-### Deploy to Netlify
-1. Build the application:
-   ```bash
-   npm run build
-   ```
-2. Configure Netlify to serve the `out` directory
-
-### Deploy to Custom Server
-1. Build the application:
-   ```bash
-   npm run build
-   ```
-2. Start the production server:
-   ```bash
-   npm start
-   ```
+The application is containerized with Docker and can be deployed using the provided Dockerfile.
 
 ## Environment Variables
 Create a `.env.local` file in the root directory to configure environment variables:

@@ -1,10 +1,4 @@
-const User = require('../models/User');
-const Artist = require('../models/Artist');
-const Track = require('../models/Track');
-const Album = require('../models/Album');
-const Event = require('../models/Event');
-const Venue = require('../models/Venue');
-const Report = require('../models/Report');
+const { User, Artist, Track, Album, Event, Venue, Report } = require('../models');
 const sequelize = require('../config/database');
 const { Sequelize } = require('sequelize');
 

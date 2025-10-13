@@ -8,17 +8,44 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
+      console.log('Login thunk called with credentials:', credentials);
+      console.log('API_BASE_URL:', API_BASE_URL);
+      console.log('Full request URL:', `${API_BASE_URL}/auth/login`);
+      
+      // Add a timeout to the fetch request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(credentials),
+        signal: controller.signal
       });
       
-      const data = await response.json();
+      clearTimeout(timeoutId);
+      
+      console.log('Fetch response received:', response);
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
+      const text = await response.text();
+      console.log('Response text:', text);
+      
+      // Try to parse as JSON
+      let data;
+      try {
+        data = JSON.parse(text);
+        console.log('Parsed JSON data:', data);
+      } catch (parseError) {
+        console.error('Failed to parse response as JSON:', parseError);
+        return rejectWithValue('Invalid response format');
+      }
       
       if (!response.ok) {
+        console.log('Login failed with data:', data);
         return rejectWithValue(data.error || 'Login failed');
       }
       
@@ -27,7 +54,17 @@ export const login = createAsyncThunk(
       
       return data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Network error');
+      console.error('Network error occurred in login thunk:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      
+      // Check if it's an abort error (timeout)
+      if (error.name === 'AbortError') {
+        return rejectWithValue('Request timeout - please try again');
+      }
+      
+      return rejectWithValue(error.message || 'Network error occurred');
     }
   }
 );
@@ -167,7 +204,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: null,
-    token: localStorage.getItem('token') || null,
+    token: typeof window !== 'undefined' ? localStorage.getItem('token') || null : null,
     isAuthenticated: false,
     loading: false,
     error: null,
@@ -179,6 +216,17 @@ const authSlice = createSlice({
     setToken: (state, action) => {
       state.token = action.payload;
       state.isAuthenticated = !!action.payload;
+    },
+    loadUserFromStorage: (state) => {
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('token');
+        if (token) {
+          state.token = token;
+          state.isAuthenticated = true;
+          // In a real app, you would also fetch the user profile here
+          // For now, we'll just set the token
+        }
+      }
     },
   },
   extraReducers: (builder) => {
@@ -269,5 +317,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, setToken } = authSlice.actions;
+export const { clearError, setToken, loadUserFromStorage } = authSlice.actions;
 export default authSlice.reducer;

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AuthSlice Test</title>
+</head>
+<body>
+    <h1>AuthSlice Test</h1>
+    <button id="testLogin">Test Login Function</button>
+    <div id="result"></div>
+
+    <script type="module">
+        // Test the login function directly
+        const API_BASE_URL = 'http://localhost:3002/api/v1';
+        
+        async function login(credentials) {
+            try {
+                console.log('Attempting to login with credentials:', credentials);
+                console.log('API_BASE_URL:', API_BASE_URL);
+                console.log('Full URL:', `${API_BASE_URL}/auth/login`);
+                
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(credentials),
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    console.log('Login failed with data:', data);
+                    throw new Error(data.error || 'Login failed');
+                }
+                
+                document.getElementById('result').innerHTML = '<pre>Success:\n' + JSON.stringify(data, null, 2) + '</pre>';
+                return data;
+            } catch (error) {
+                console.error('Network error occurred:', error);
+                document.getElementById('result').innerHTML = '<pre>Error: ' + error.message + '</pre>';
+                throw error;
+            }
+        }
+        
+        document.getElementById('testLogin').addEventListener('click', async () => {
+            try {
+                document.getElementById('result').innerHTML = '<p>Testing login function...</p>';
+                await login({ email: 'devtest@example.com', password: 'DevPass123!' });
+            } catch (error) {
+                console.error('Test failed:', error);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Track Upload Test</title>
+</head>
+<body>
+    <h1>Track Upload Test</h1>
+    
+    <form id="uploadForm">
+        <div>
+            <label for="title">Track Title:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        
+        <div>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description"></textarea>
+        </div>
+        
+        <div>
+            <label for="audioFile">Audio File:</label>
+            <input type="file" id="audioFile" name="audio" accept="audio/*" required>
+        </div>
+        
+        <div>
+            <label for="coverArtFile">Cover Art (Optional):</label>
+            <input type="file" id="coverArtFile" name="coverArt" accept="image/*">
+        </div>
+        
+        <div>
+            <label for="token">JWT Token:</label>
+            <input type="text" id="token" name="token" size="50" required>
+        </div>
+        
+        <button type="submit">Upload Track</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('audio', document.getElementById('audioFile').files[0]);
+            if (document.getElementById('coverArtFile').files[0]) {
+                formData.append('coverArt', document.getElementById('coverArtFile').files[0]);
+            }
+            
+            const token = document.getElementById('token').value;
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/v1/track-upload/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('result').innerHTML = `<p style="color: green;">Success: ${JSON.stringify(result)}</p>`;
+                } else {
+                    document.getElementById('result').innerHTML = `<p style="color: red;">Error: ${result.error}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Login</title>
+</head>
+<body>
+    <h1>Debug Login</h1>
+    <button id="testFetch">Test Fetch</button>
+    <button id="testLogin">Test Login</button>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('testFetch').addEventListener('click', async () => {
+            try {
+                document.getElementById('result').innerHTML = '<p>Testing fetch to health endpoint...</p>';
+                
+                const response = await fetch('http://localhost:3002/health');
+                const data = await response.json();
+                document.getElementById('result').innerHTML = '<pre>Health check:\n' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<pre>Fetch error: ' + error.message + '</pre>';
+                console.error('Fetch error:', error);
+            }
+        });
+        
+        document.getElementById('testLogin').addEventListener('click', async () => {
+            try {
+                document.getElementById('result').innerHTML = '<p>Testing login...</p>';
+                
+                const response = await fetch('http://localhost:3002/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@example.com',
+                        password: 'AdminPass123!'
+                    })
+                });
+                
+                const text = await response.text();
+                document.getElementById('result').innerHTML = '<pre>Login response:\nStatus: ' + response.status + '\nText: ' + text + '</pre>';
+                
+                try {
+                    const data = JSON.parse(text);
+                    document.getElementById('result').innerHTML += '<pre>JSON: ' + JSON.stringify(data, null, 2) + '</pre>';
+                } catch (parseError) {
+                    document.getElementById('result').innerHTML += '<pre>Failed to parse JSON: ' + parseError.message + '</pre>';
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<pre>Login error: ' + error.message + '</pre>';
+                console.error('Login error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -28,7 +28,10 @@ app.use(generalLimiter);
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'],
+  credentials: true
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -93,23 +96,26 @@ app.use('/api/v1/likes', require('./routes/likes.routes'));
 app.use('/api/v1/shares', require('./routes/shares.routes'));
 app.use('/api/v1/cache', require('./routes/cache.routes'));
 app.use('/api/v1/db-optimization', require('./routes/dbOptimization.routes'));
+app.use('/api/v1/admin', require('./routes/admin.routes'));
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  logger.error(err.stack);
-  res.status(500).json({ 
-    error: 'Something went wrong!',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
+// AI Error Handling Routes
+app.use('/api/v1/ai-error-handling', require('./routes/aiErrorHandling.routes'));
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
+// AI Error Handling Middleware
+const aiErrorHandling = require('./middleware/aiErrorHandling.middleware');
 
-// Set up model associations
-setupAssociations();
+// Specific error handlers
+app.use(aiErrorHandling.handleValidationError());
+app.use(aiErrorHandling.handleAuthError());
+app.use(aiErrorHandling.handleDatabaseError());
+app.use(aiErrorHandling.handleRateLimitError());
+app.use(aiErrorHandling.handleFileUploadError());
+
+// Main AI error handler
+app.use(aiErrorHandling.handleError());
+
+// 404 handler with AI analysis
+app.use(aiErrorHandling.handleNotFound());
 
 // Database initialization - only run when not in test environment
 if (process.env.NODE_ENV !== 'test') {
@@ -120,9 +126,14 @@ if (process.env.NODE_ENV !== 'test') {
       await sequelize.authenticate();
       logger.info('Database connection has been established successfully.');
       
-      // Sync models
-      await sequelize.sync({ alter: true });
+      // Sync models - use a simpler approach to avoid table recreation loops
+      // In development, we'll only create tables that don't exist
+      // In production, we might want to use migrations instead
+      await sequelize.sync({ alter: false, force: false });
       logger.info('Database models synchronized successfully.');
+      
+      // Set up model associations after models are synchronized
+      setupAssociations();
       
       // Seed initial data
       await seedBoroughs();

@@ -1,6 +1,6 @@
 // Shared utilities and constants for NYCMG platform
 
-export const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001/api/v1';
+export const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002/api/v1';
 
 export const BOROUGHS = {
   MANHATTAN: 'Manhattan',

@@ -13,6 +13,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import ArtistProfileScreen from '../screens/ArtistProfileScreen';
 import MapDiscoveryScreen from '../screens/MapDiscoveryScreen';
 import PlaylistDetailScreen from '../screens/PlaylistDetailScreen';
+import ErrorHandlingScreen from '../screens/ErrorHandlingScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -87,6 +88,21 @@ export const AppNavigator = () => {
         component={PlaylistDetailScreen} 
         options={{ 
           title: 'Playlist',
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: '#FF4081',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      />
+      <Stack.Screen 
+        name="ErrorHandling" 
+        component={ErrorHandlingScreen} 
+        options={{ 
+          title: 'Error Handling',
           headerShown: true,
           headerStyle: {
             backgroundColor: '#FF4081',

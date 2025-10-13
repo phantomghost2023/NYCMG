@@ -1,4 +1,8 @@
-const { Track, Artist, Album, Genre } = require('../models');
+const models = require('../models');
+const Track = models.Track;
+const Artist = models.Artist;
+const Album = models.Album;
+const Genre = models.Genre;
 const { Op } = require('sequelize');
 const { 
   getCachedTrack, 
@@ -28,8 +32,8 @@ const getAllTracks = async (options = {}) => {
     // Add search filter if provided
     if (search) {
       whereClause[Op.or] = [
-        { title: { [Op.iLike]: `%${search}%` } },
-        { description: { [Op.iLike]: `%${search}%` } }
+        { title: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } }
       ];
     }
     
@@ -47,7 +51,8 @@ const getAllTracks = async (options = {}) => {
     if (isExplicit !== undefined) {
       whereClause.is_explicit = isExplicit;
     }
-    
+
+    // Simplified include for debugging
     const includeOptions = [
       {
         model: Artist,
@@ -55,7 +60,7 @@ const getAllTracks = async (options = {}) => {
         attributes: ['id', 'artist_name'] // Only necessary fields
       }
     ];
-    
+
     // Add album include only if album_id exists
     includeOptions.push({
       model: Album,
@@ -63,7 +68,7 @@ const getAllTracks = async (options = {}) => {
       attributes: ['id', 'title'],
       required: false // LEFT JOIN to avoid excluding tracks without albums
     });
-    
+
     // Add genre filter if provided
     if (genreIds && genreIds.length > 0) {
       includeOptions.push({
@@ -82,14 +87,14 @@ const getAllTracks = async (options = {}) => {
         required: false // LEFT JOIN to include tracks without genres
       });
     }
-    
+
     // Validate sortBy parameter
     const validSortFields = ['created_at', 'title', 'release_date'];
     const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
-    
+
     // Validate sortOrder parameter
     const sortOrderValue = sortOrder === 'ASC' ? 'ASC' : 'DESC';
-    
+
     // Optimized query with specific attributes and performance improvements
     const tracks = await Track.findAndCountAll({
       attributes: ['id', 'title', 'artist_id', 'album_id', 'duration', 'release_date', 'is_explicit', 'status', 'created_at', 'updated_at'],
@@ -101,7 +106,7 @@ const getAllTracks = async (options = {}) => {
       distinct: true, // Ensure accurate count when using includes
       logging: false // Disable logging in production for better performance
     });
-    
+
     const result = {
       tracks: tracks.rows,
       totalCount: tracks.count,

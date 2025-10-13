@@ -3,7 +3,11 @@
 param(
     [switch]$Clean = $false,
     [switch]$UseYarn = $false,
-    [switch]$Verbose = $false
+    [switch]$Verbose = $false,
+    [switch]$SkipBackend = $false,
+    [switch]$SkipWeb = $false,
+    [switch]$SkipMobile = $false,
+    [switch]$SkipShared = $false
 )
 
 function Write-Log {
@@ -47,26 +51,39 @@ function Install-Dependencies {
     Write-Log "Installing $Name dependencies..." "INFO"
     
     try {
+        # Save current location
+        $originalLocation = Get-Location
+        
+        # Change to target directory
         Set-Location $Path
         
+        # Check if package.json exists
+        if (-not (Test-Path "package.json")) {
+            Write-Log "No package.json found in $Name, skipping..." "WARN"
+            Set-Location $originalLocation
+            return $true
+        }
+        
+        # Use yarn if available and requested, otherwise use npm
         if ($UseYarn -and (Test-Command "yarn")) {
             Write-Log "Using yarn for $Name..." "DEBUG"
-            yarn install
+            yarn install --frozen-lockfile
         } else {
             Write-Log "Using npm with legacy-peer-deps for $Name..." "DEBUG"
-            npm install --legacy-peer-deps --no-audit --no-fund
+            npm install --legacy-peer-deps --no-audit --no-fund --prefer-offline
         }
         
         if ($LASTEXITCODE -ne 0) {
-            throw "Failed to install $Name dependencies"
+            throw "Failed to install $Name dependencies (exit code: $LASTEXITCODE)"
         }
         
         Write-Log "Successfully installed $Name dependencies" "INFO"
-        Set-Location ..
+        Set-Location $originalLocation
         return $true
     } catch {
         Write-Log "Error installing $Name dependencies: $($_.Exception.Message)" "ERROR"
-        Set-Location ..
+        # Always return to original location
+        Set-Location $originalLocation
         return $false
     }
 }
@@ -92,22 +109,37 @@ function Clear-Cache {
 }
 
 function Remove-NodeModules {
-    Write-Log "Removing node_modules directories and package-lock.json files..." "INFO"
+    Write-Log "Removing node_modules directories and lock files..." "INFO"
     
-    Get-ChildItem -Recurse -Directory -Name "node_modules" | ForEach-Object {
+    # Remove node_modules directories
+    Get-ChildItem -Recurse -Directory -Name "node_modules" -ErrorAction SilentlyContinue | ForEach-Object {
         Write-Log "Removing $_" "DEBUG"
-        Remove-Item $_ -Recurse -Force -ErrorAction SilentlyContinue
+        try {
+            Remove-Item $_ -Recurse -Force -ErrorAction Stop
+        } catch {
+            Write-Log "Failed to remove $_ : $($_.Exception.Message)" "WARN"
+        }
     }
     
+    # Remove package-lock.json files
     Get-ChildItem -Recurse -Name "package-lock.json" -ErrorAction SilentlyContinue | ForEach-Object {
         Write-Log "Removing $_" "DEBUG"
-        Remove-Item $_ -Force -ErrorAction SilentlyContinue
+        try {
+            Remove-Item $_ -Force -ErrorAction Stop
+        } catch {
+            Write-Log "Failed to remove $_ : $($_.Exception.Message)" "WARN"
+        }
     }
     
+    # Remove yarn.lock files if yarn is available
     if (Test-Command "yarn") {
         Get-ChildItem -Recurse -Name "yarn.lock" -ErrorAction SilentlyContinue | ForEach-Object {
             Write-Log "Removing $_" "DEBUG"
-            Remove-Item $_ -Force -ErrorAction SilentlyContinue
+            try {
+                Remove-Item $_ -Force -ErrorAction Stop
+            } catch {
+                Write-Log "Failed to remove $_ : $($_.Exception.Message)" "WARN"
+            }
         }
     }
 }
@@ -115,11 +147,12 @@ function Remove-NodeModules {
 function Fix-PackageJson {
     Write-Log "Fixing package.json files..." "INFO"
     
-    # Fix mobile React version
+    # Fix mobile React version compatibility
     $mobilePackageJsonPath = "mobile\package.json"
     if (Test-Path $mobilePackageJsonPath) {
         try {
             $mobilePackageJson = Get-Content $mobilePackageJsonPath | ConvertFrom-Json
+            # Ensure React versions are compatible
             $mobilePackageJson.dependencies.react = "18.2.0"
             $mobilePackageJson."devDependencies"."react-test-renderer" = "18.2.0"
             $mobilePackageJson | ConvertTo-Json -Depth 10 | Set-Content $mobilePackageJsonPath
@@ -129,7 +162,7 @@ function Fix-PackageJson {
         }
     }
     
-    # Fix root workspaces
+    # Fix root workspaces configuration
     $rootPackageJsonPath = "package.json"
     if (Test-Path $rootPackageJsonPath) {
         try {
@@ -142,7 +175,7 @@ function Fix-PackageJson {
         }
     }
     
-    # Fix lerna.json
+    # Fix lerna.json if it exists
     $lernaJsonPath = "lerna.json"
     if (Test-Path $lernaJsonPath) {
         try {
@@ -159,6 +192,7 @@ function Fix-PackageJson {
 # Main execution
 Write-Log "NYCMG Robust Dependency Installation Script" "INFO"
 Write-Log "Options - Clean: $Clean, UseYarn: $UseYarn, Verbose: $Verbose" "DEBUG"
+Write-Log "Skip Modules - Backend: $SkipBackend, Web: $SkipWeb, Mobile: $SkipMobile, Shared: $SkipShared" "DEBUG"
 
 # Check if we're in the right directory
 if (-not (Test-Path "package.json")) {
@@ -195,36 +229,43 @@ if (-not $success) {
     exit 1
 }
 
+# Install module dependencies
+$installResults = @{}
+
 # Install backend dependencies
-if (Test-Path "backend") {
-    $success = Install-Dependencies "backend" "backend"
-    if (-not $success) {
-        Write-Log "Failed to install backend dependencies" "ERROR"
-    }
+if (-not $SkipBackend -and (Test-Path "backend")) {
+    $installResults["backend"] = Install-Dependencies "backend" "backend"
 }
 
 # Install web dependencies
-if (Test-Path "web") {
-    $success = Install-Dependencies "web" "web"
-    if (-not $success) {
-        Write-Log "Failed to install web dependencies" "ERROR"
-    }
+if (-not $SkipWeb -and (Test-Path "web")) {
+    $installResults["web"] = Install-Dependencies "web" "web"
 }
 
 # Install mobile dependencies
-if (Test-Path "mobile") {
-    $success = Install-Dependencies "mobile" "mobile"
-    if (-not $success) {
-        Write-Log "Failed to install mobile dependencies" "ERROR"
-    }
+if (-not $SkipMobile -and (Test-Path "mobile")) {
+    $installResults["mobile"] = Install-Dependencies "mobile" "mobile"
 }
 
 # Install shared dependencies
-if (Test-Path "shared") {
-    $success = Install-Dependencies "shared" "shared"
-    if (-not $success) {
-        Write-Log "Failed to install shared dependencies" "ERROR"
+if (-not $SkipShared -and (Test-Path "shared")) {
+    $installResults["shared"] = Install-Dependencies "shared" "shared"
+}
+
+# Check results and report
+$allSuccessful = $true
+foreach ($module in $installResults.Keys) {
+    if (-not $installResults[$module]) {
+        $allSuccessful = $false
+        Write-Log "Failed to install $module dependencies" "ERROR"
     }
+}
+
+if ($allSuccessful) {
+    Write-Log "All dependency installations completed successfully!" "INFO"
+} else {
+    Write-Log "Some dependency installations failed. Check the errors above." "ERROR"
+    exit 1
 }
 
 Write-Log "Dependency installation process completed!" "INFO"

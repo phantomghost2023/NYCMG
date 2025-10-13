@@ -1,4 +1,6 @@
-const { Artist, User } = require('../models');
+const models = require('../models');
+const Artist = models.Artist;
+const User = models.User;
 const { 
   getCachedArtist, 
   setCachedArtist, 
