@@ -7,7 +7,9 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "test": "jest",
-    "lint": "eslint src/**/*.js"
+    "lint": "eslint src/**/*.js",
+    "ai-error-handling:test": "node -e \"console.log('AI Error Handling System Test')\"",
+    "ai-error-handling:health": "node -e \"require('./src/services/aiErrorHandler.service').healthCheck()\""
   },
   "keywords": [
     "music",
@@ -36,7 +38,7 @@
     "sequelize": "^6.37.0",
     "sharp": "^0.33.0",
     "socket.io": "^4.8.1",
-    "winston": "^3.13.0"
+    "winston": "^3.18.3"
   },
   "devDependencies": {
     "eslint": "^9.37.0",

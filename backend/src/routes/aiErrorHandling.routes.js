@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const aiErrorChatController = require('../controllers/aiErrorChat.controller');
-const { authenticateToken, authorizeRole } = require('../../middleware/auth.middleware');
-const { generalLimiter } = require('../../middleware/rateLimit.middleware');
+const { authenticateToken, authorizeRole } = require('../middleware/auth.middleware');
+const { generalLimiter } = require('../middleware/rateLimit.middleware');
 
 // Apply rate limiting to all routes
 router.use(generalLimiter);

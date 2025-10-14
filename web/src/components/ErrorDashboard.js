@@ -47,7 +47,8 @@ import {
   Storage as StorageIcon,
   NetworkCheck as NetworkCheckIcon,
   Memory as MemoryIcon,
-  Cpu as CpuIcon
+  Cpu as CpuIcon,
+  CircularProgress
 } from '@mui/icons-material';
 import {
   LineChart,
